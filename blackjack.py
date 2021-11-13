@@ -14,7 +14,26 @@ rankVaules = {
 playing = True
 
 # 1. Create Card
+
+class Card:
+
+    def __init__(self, suit, rank):
+        self.suit = suit
+        self.rank = rank
+
+    def __str__(self):
+        return self.rank + " of " + self.suit
+
 # 2. Create Deck and include a shuffle
+
+class Deck:
+
+    def __init__(self):  # step through suits and ranks to create Card and Deck
+        self.deck = []
+        for suit in suits:
+            for rank in ranks:
+                self.deck.append(Card(suit, rank))
+
 # 3. Create Hand
 # 4. Create Player Profile with name, wallet, and hand
 class Player:
