@@ -1,7 +1,7 @@
 """Import needed libraries"""
 import random
 import datetime
-from sys import exit
+from os import system
 
 # Constants and Global Variables
 suits = ["Hearts", "Diamonds", "Spades", "Clubs"]
@@ -13,6 +13,16 @@ rankValues = {
 }
 
 PLAYING = True
+
+def print_divider():
+    """Prints divider on terminal"""
+    print("-----------------------------------------------------------")
+    print("-----------------------------------------------------------")
+
+def clear():
+    """Clears the terminal"""
+    clear_ = system('cls')
+    return clear_
 
 # 1. Create Card
 
@@ -81,12 +91,12 @@ class Player:
         for card in self.hand.cards:
             print(card.card_name)
 
-    def update_wallet(self, result, pot):
+    def update_wallet(self, result):
         """Updates the player's wallet if they won"""
         if result == "won":
-            self.wallet += pot
+            self.wallet += self.bet
         else:
-            self.wallet -= pot
+            self.wallet -= self.bet
 
 class Dealer:
     """Build out dealer profile"""
@@ -105,7 +115,98 @@ class Dealer:
         print("\nDealer's hand is: ", *self.hand.cards, sep="\n")
         print("Dealer's hand =", self.hand.value)
 
-# 5. Greet Player and ask for name
+# 5. Define functions used for game play
+def take_bet(player):
+    """Take bet from the player"""
+    while True:
+        try:
+            player.bet = int(input("How much would you like to bet? "))
+        except ValueError:
+            print("Sorry, you bet must be an integer!")
+        else:
+            if player.bet > player.wallet:
+                print(f"Sorry, your bet cannot exceed {player.wallet}")
+            else:
+                break
+
+def hit(deck, hand):
+    """If player hits take more cards"""
+    hand.add_card(deck.deal())
+    hand.adjust_for_aces()
+
+def hit_or_stand(deck, hand):
+    """Askes player if they want to hit or stand"""
+    global PLAYING
+
+    while True:
+        h_or_s = input("Would you like to Hit or Stand? Enter 'h' or 's'")
+
+        if h_or_s[0].lower == 'h':
+            hit(deck, hand)
+        elif h_or_s[0].lower() == 's':
+            print("Player stands. Dealer is playing.")
+            PLAYING = False
+        else:
+            print("Sorry, please try again.")
+            continue
+        break
+
+def player_busts(player):
+    """What to do if player busts"""
+    print("Player busts!")
+    player.update_wallet("lost")
+
+def player_wins(player):
+    """What to do if player wins"""
+    print(f"{player.name} wins!")
+    player.update_wallet("won")
+
+def dealer_busts(player):
+    """What to do if dealer busts"""
+    print("Dealer busts!")
+    player.update_wallet("won")
+
+def dealer_wins(player):
+    """What to do if dealer wins"""
+    print("Dealer wins!")
+    player.update_wallet("lost")
+
+def push(player):
+    """What happens if it is a tie"""
+    print(f"Dealer and {player.name} tie! It's a push.")
+
+def greeting():
+    """Creates a greeting"""
+    date_time = str(datetime.datetime.now().time())
+    date_time = int(date_time[:2])
+    time_of_day = ""
+    if date_time < 12 and date_time > 00:
+        time_of_day = "Good morning!"
+    elif date_time > 12 and date_time < 18:
+        time_of_day = "Good afternoon!"
+    else:
+        time_of_day = "Good evening!"
+
+    while True:
+        try:
+            name = input(f"{time_of_day} Please enter your name: \n")
+            name = name[0].upper() + name[1:]
+            wallet = input("How much money would you like to start with? (Default is $100)")
+            break
+        except IndexError:
+            print("Enter a name first.")
+            continue
+    return name, wallet
+# 6. Greet Player and ask for name
+clear()
+print_divider()
+print("Welcome to Sean's Casino (BlackJack v1.0)")
+print_divider()
+
+playername, playerwallet = greeting()
+
+player1 = Player(playername, playerwallet)
+
 # 6. Ask player to bet, add to pot, and substract from player wallet
 # 7. Deal to player and comp (hide comp until player stands)
 # 8. Ask player to hit or stand
