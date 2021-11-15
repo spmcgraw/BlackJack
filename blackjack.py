@@ -51,7 +51,7 @@ class Deck:
 
     def deal(self):
         """Deals the cards one at a time"""
-        single_card = self.deck.pop
+        single_card = self.deck.pop(0)
         return single_card
 
 # 3. Create Hand
@@ -87,10 +87,8 @@ class Player:
 
     def print_hand(self):
         """Prints player's hand"""
-        print(f"{self.name}'s hand is: ")
-        for card in self.hand.cards:
-            print(card.card_name)
-
+        print(f"{self.name}'s hand is: ", *self.hand.cards, sep = '\n')
+        
     def update_wallet(self, result):
         """Updates the player's wallet if they won"""
         if result == "won":
@@ -189,9 +187,9 @@ def greeting():
 
     while True:
         try:
-            name = input(f"{time_of_day} Please enter your name: \n")
-            name = name[0].upper() + name[1:]
-            wallet = input("How much money would you like to start with? (Default is $100)")
+            name = input(f"{time_of_day} Please enter your name:\n")
+            name = name[0].upper() + name[1:].lower()
+            wallet = int(input("How much money would you like to start with? (Default is $100)\n"))
             break
         except IndexError:
             print("Enter a name first.")
@@ -205,8 +203,28 @@ print_divider()
 
 playername, playerwallet = greeting()
 
+# 7. Game play loop
+# while True:
+# Create & shuffle deck, deal two cards to each player
+deck = Deck()
+deck.shuffle()
+print(deck.deal())
 player1 = Player(playername, playerwallet)
+player1.hand.add_card(deck.deal())
+player1.hand.add_card(deck.deal())
 
+dealer = Dealer()
+dealer.hand.add_card(deck.deal())
+dealer.hand.add_card(deck.deal())
+
+# Prompt the Player for their bet
+take_bet(player1)
+
+# Show cards with keeping one dealer card hidden
+dealer.print_hand_stage1()
+player1.print_hand()
+
+# Game play loop
 # 6. Ask player to bet, add to pot, and substract from player wallet
 # 7. Deal to player and comp (hide comp until player stands)
 # 8. Ask player to hit or stand
