@@ -131,7 +131,7 @@ def take_bet(player):
 def hit(deck, hand):
     """If player hits take more cards"""
     hand.add_card(deck.deal())
-    hand.adjust_for_aces()
+    hand.adjust_aces()
 
 def hit_or_stand(deck, hand):
     """Askes player if they want to hit or stand"""
@@ -140,7 +140,7 @@ def hit_or_stand(deck, hand):
     while True:
         h_or_s = input("Would you like to Hit or Stand? Enter 'h' or 's'")
 
-        if h_or_s[0].lower == 'h':
+        if h_or_s[0].lower() == 'h':
             hit(deck, hand)
         elif h_or_s[0].lower() == 's':
             print("Player stands. Dealer is playing.")
@@ -190,7 +190,12 @@ def greeting():
         try:
             name = input(f"{time_of_day} Please enter your name:\n")
             name = name[0].upper() + name[1:].lower()
-            wallet = int(input("How much money would you like to start with? (Default is $100)\n"))
+            try:
+                wallet = int(
+                    input("How much money would you like to start with? (Default is $100)\n")
+                    )
+            except ValueError:
+                wallet = 100
             break
         except IndexError:
             print("Enter a name first.")
@@ -209,7 +214,7 @@ while True:
     # Create & shuffle deck, deal two cards to each player
     deck = Deck()
     deck.shuffle()
-    print(deck.deal())
+
     player1 = Player(playername, playerwallet)
     player1.hand.add_card(deck.deal())
     player1.hand.add_card(deck.deal())
