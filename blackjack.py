@@ -87,8 +87,9 @@ class Player:
 
     def print_hand(self):
         """Prints player's hand"""
-        print(f"{self.name}'s hand is: ", *self.hand.cards, sep = '\n')
-        
+        print(f"\n{self.name}'s hand is: ", *self.hand.cards, sep = '\n')
+        print(f"Card value = {self.hand.value}")
+
     def update_wallet(self, result):
         """Updates the player's wallet if they won"""
         if result == "won":
@@ -204,26 +205,77 @@ print_divider()
 playername, playerwallet = greeting()
 
 # 7. Game play loop
-# while True:
-# Create & shuffle deck, deal two cards to each player
-deck = Deck()
-deck.shuffle()
-print(deck.deal())
-player1 = Player(playername, playerwallet)
-player1.hand.add_card(deck.deal())
-player1.hand.add_card(deck.deal())
+while True:
+    # Create & shuffle deck, deal two cards to each player
+    deck = Deck()
+    deck.shuffle()
+    print(deck.deal())
+    player1 = Player(playername, playerwallet)
+    player1.hand.add_card(deck.deal())
+    player1.hand.add_card(deck.deal())
 
-dealer = Dealer()
-dealer.hand.add_card(deck.deal())
-dealer.hand.add_card(deck.deal())
+    dealer = Dealer()
+    dealer.hand.add_card(deck.deal())
+    dealer.hand.add_card(deck.deal())
 
-# Prompt the Player for their bet
-take_bet(player1)
+    # Prompt the Player for their bet
+    take_bet(player1)
 
-# Show cards with keeping one dealer card hidden
-dealer.print_hand_stage1()
-player1.print_hand()
+    # Show cards with keeping one dealer card hidden
+    dealer.print_hand_stage1()
+    player1.print_hand()
 
+    while PLAYING:
+
+        # Prompt to see if player wants to hit or stand
+        hit_or_stand(deck, player1.hand)
+
+        # Show cards after player stands, still hiding one dealer card
+        dealer.print_hand_stage1()
+        player1.print_hand()
+
+        # Check if player busts and break while loop
+        if player1.hand.value > 21:
+            player_busts(player1)
+
+            break
+
+    # If player did not bust, play Dealer's hand (rule: Dealer stands at >= 17)
+    if player1.hand.value <= 21:
+
+        while dealer.hand.value < 17:
+            hit(deck, dealer.hand)
+
+        # Show all cards now
+        dealer.print_hand_all()
+        player1.print_hand()
+
+        # Check to see who won
+        if dealer.hand.value > 21:
+            dealer_busts(player1)
+        elif dealer.hand.value > player1.hand.value:
+            dealer_wins(player1)
+        elif dealer.hand.value < player1.hand.value:
+            player_wins(player1)
+        else:
+            push(player1)
+
+    # Let player know how much they won and rest bet to 0 for new game
+    print(f"\n {player1.name}'s won ${player1.bet} and now has ${player1.wallet} in their wallet.")
+    player1.bet = 0
+
+    # Ask to play again
+    if player1.wallet > 0:
+        new_game = input("Would you like to play again? Enter 'y' or 'n'")
+        if new_game[0].lower() == 'y':
+            PLAYING = True
+            continue
+        else:
+            print("Thanks for playing!")
+            break
+    else:
+        print("You have no more money left. Thanks for playing! Goodbye")
+        break
 # Game play loop
 # 6. Ask player to bet, add to pot, and substract from player wallet
 # 7. Deal to player and comp (hide comp until player stands)
