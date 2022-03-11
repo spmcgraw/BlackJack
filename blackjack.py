@@ -281,9 +281,4 @@ while True:
     else:
         print("You have no more money left. Thanks for playing! Goodbye")
         break
-# Game play loop
-# 6. Ask player to bet, add to pot, and substract from player wallet
-# 7. Deal to player and comp (hide comp until player stands)
-# 8. Ask player to hit or stand
-# 9. Annouce winner - If player wins add pot to their wallet
-# 10. Ask player if they want to play again
+
